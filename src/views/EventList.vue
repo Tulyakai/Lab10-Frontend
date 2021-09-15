@@ -71,14 +71,22 @@ export default {
       })
   },
   beforeRouteUpdate(routeTo) {
-    EventService.getEvents(3, parseInt(routeTo.query.page) || 1)
-      .then((response) => {
-        this.events = response.data // <-----
-        this.totalEvents = response.headers['x-total-count'] // <-----
-      })
-      .catch(() => {
-        return { name: 'NetworkError' }
-      })
+    var queryFunction
+      if (this.keyword === '') {
+        queryFunction = EventService.getEvents(3, parseInt(routeTo.query.page) || 1)
+      } else {
+        queryFunction = EventService.getEventByKeyword(this.keyword, 3,  parseInt(routeTo.query.page) || 1)
+      }
+      queryFunction
+        .then((res) => {
+          this.events = res.data
+          console.log(this.events)
+          this.totalEvents = res.headers['x-total-count']
+          console.log(this.totalEvents)
+        })
+        .catch(() => {
+          return { name: 'NetworkError' }
+        })
   },
   methods: {
     updateKeyword() {
@@ -91,9 +99,7 @@ export default {
       queryFunction
         .then((res) => {
           this.events = res.data
-          console.log(this.events)
           this.totalEvents = res.headers['x-total-count']
-          console.log(this.totalEvents)
         })
         .catch(() => {
           return { name: 'NetworkError' }
